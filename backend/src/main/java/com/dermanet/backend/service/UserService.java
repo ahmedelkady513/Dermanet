@@ -11,5 +11,7 @@ public interface UserService {
 
     AuthenticationResponse login(LoginDto request);
 
-    User getCurrentUser();    
+    User getCurrentUser(); 
+    
+
 }

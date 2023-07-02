@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     public AuthenticationResponse register(User user) {
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.getAddresses().forEach(adress -> adress.setUser(user));
+        user.getAddresses().forEach(address -> address.setUser(user));
         repository.save(user);
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(jwtToken).build();
@@ -51,5 +51,7 @@ public class UserServiceImpl implements UserService {
     public User getCurrentUser() {
         return repository.findByUsername(CurrentUserUtils.getCurrentUsername()).orElseThrow();
     }
+
+
 
 }
