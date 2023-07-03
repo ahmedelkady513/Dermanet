@@ -6,5 +6,5 @@ import com.dermanet.backend.entity.Address;
 
 public interface AddressService {
     Address save(Address address);
-     List<Address> getAddressesForUser();
+    List<Address> getAddressesForUser();
 }

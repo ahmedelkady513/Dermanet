@@ -38,8 +38,7 @@ public class Case {
     @JoinColumn(name = "case_user_id")
     private User user;
 
-    @OneToMany(mappedBy = "imageCase", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CaseImage> images = new ArrayList<>();
+    private String caseImage;
 
     @OneToMany(mappedBy = "diagnoseCase", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Diagnose> diagnoses = new ArrayList<>();

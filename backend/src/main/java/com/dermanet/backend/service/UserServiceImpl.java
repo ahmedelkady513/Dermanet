@@ -6,7 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dermanet.backend.dtos.LoginDto;
-import com.dermanet.backend.dtos.AuthenticationResponse;
+import com.dermanet.backend.dtos.SocialDto;
+import com.dermanet.backend.dtos.JwtDto;
 import com.dermanet.backend.entity.Role;
 import com.dermanet.backend.entity.User;
 import com.dermanet.backend.repository.UserRepository;
@@ -27,31 +28,52 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public AuthenticationResponse register(User user) {
+    public User register(User user) {
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.getAddresses().forEach(address -> address.setUser(user));
-        repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return repository.save(user);
     }
 
     @Override
-    public AuthenticationResponse login(LoginDto loginDto) {
+    public JwtDto login(LoginDto loginDto) {
+        var user = authenticateUser(loginDto.getUsername(), loginDto.getPassword());
+        var jwtToken = jwtService.generateToken(user);
+        return JwtDto.builder().token(jwtToken).build();
+    }
+
+    private User registerSocial(SocialDto socialDto) {
+        User socialUser = User.builder().firstName(socialDto.getFirstName())
+                .lastName(socialDto.getLastName())
+                .email(socialDto.getEmail())
+                .password(socialDto.getTokenId())
+                .username(socialDto.getEmail().split("@")[0])
+                .role(Role.SOCIAL)
+                .build();
+        return repository.save(socialUser);
+    }
+
+    @Override
+    public JwtDto socialLogin(SocialDto socialDto) {
+        String username = socialDto.getEmail().split("@")[0];
+        String password = socialDto.getTokenId();
+        User user = repository.findByUsername(username).orElseGet(() -> registerSocial(socialDto));
+        authenticateUser(username, password);
+        var jwtToken = jwtService.generateToken(user);
+        return JwtDto.builder().token(jwtToken).build();
+    }
+
+    private User authenticateUser(String username, String password) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginDto.getUsername(),
-                        loginDto.getPassword()));
-        var user = repository.findByUsername(loginDto.getUsername()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+                        username,
+                        password));
+        return repository.findByUsername(username).orElseThrow();
     }
 
     @Override
     public User getCurrentUser() {
         return repository.findByUsername(CurrentUserUtils.getCurrentUsername()).orElseThrow();
     }
-
-
 
 }
