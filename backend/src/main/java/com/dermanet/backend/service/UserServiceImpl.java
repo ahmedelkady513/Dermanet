@@ -6,10 +6,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dermanet.backend.dtos.LoginDto;
+import com.dermanet.backend.dtos.RegisterDto;
 import com.dermanet.backend.dtos.SocialDto;
+import com.dermanet.backend.dtos.UpdateUserDetailsDto;
+import com.dermanet.backend.dtos.UserDetailsDto;
 import com.dermanet.backend.dtos.JwtDto;
 import com.dermanet.backend.entity.Role;
 import com.dermanet.backend.entity.User;
+import com.dermanet.backend.mappers.MapStructMappers;
 import com.dermanet.backend.repository.UserRepository;
 import com.dermanet.backend.utilities.CurrentUserUtils;
 
@@ -26,6 +30,8 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
 
     private final AuthenticationManager authenticationManager;
+
+    private final MapStructMappers mapper;
 
     @Override
     public User register(User user) {
@@ -76,4 +82,12 @@ public class UserServiceImpl implements UserService {
         return repository.findByUsername(CurrentUserUtils.getCurrentUsername()).orElseThrow();
     }
 
+    @Override
+    public User updateUser(UpdateUserDetailsDto userDetailsDto) {
+        User updateUser = getCurrentUser();
+        mapper.updateUserFromUserDto(userDetailsDto, updateUser);
+        updateUser.setId(updateUser.getId());
+        updateUser.setPassword(passwordEncoder.encode(updateUser.getPassword()));
+        return repository.save(updateUser);
+    }
 }

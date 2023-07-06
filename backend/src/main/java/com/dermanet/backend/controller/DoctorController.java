@@ -21,6 +21,6 @@ public class DoctorController {
     private final MapStructMappers mapper;
     @GetMapping("doctors/get")
     public ResponseEntity<List<DoctorDto>> getDoctors() {
-        return ResponseEntity.ok(mapper.doctorToDoctorDto(doctorService.getAllDoctors()));
+        return ResponseEntity.ok(mapper.listDoctorToListDoctorDto(doctorService.getAllDoctors()));
     }
 }

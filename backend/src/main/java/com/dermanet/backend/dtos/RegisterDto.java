@@ -20,5 +20,5 @@ public class RegisterDto {
     private String password;
     private String gender;
     private Integer age;
-    private ArrayList<AddressDto> addresses;
+    private ArrayList<AddressDto> addresses = new ArrayList<>();
 }

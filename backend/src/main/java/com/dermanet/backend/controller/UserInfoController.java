@@ -1,16 +1,21 @@
 package com.dermanet.backend.controller;
 
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dermanet.backend.dtos.AddressDto;
+import com.dermanet.backend.dtos.UpdateUserDetailsDto;
 import com.dermanet.backend.dtos.UserDetailsDto;
 import com.dermanet.backend.mappers.MapStructMappers;
 import com.dermanet.backend.service.AddressService;
@@ -20,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("userInfo")
+@RequestMapping("userinfo")
 public class UserInfoController {
 
     private final UserService userService;
@@ -33,12 +38,22 @@ public class UserInfoController {
         return ResponseEntity.ok(userDto);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<UpdateUserDetailsDto> updateUser(@RequestBody UpdateUserDetailsDto updatedUser) {
+        return ResponseEntity.ok(mapper.updateUserDetailsDtoFromUser(userService.updateUser(updatedUser)));
+    }
+
     @PostMapping("/address/add")
     public ResponseEntity<AddressDto> addAddress(
             @RequestBody AddressDto addressDto) {
         var address = mapper.addressDtoToAddress(addressDto);
         addressService.save(address);
         return ResponseEntity.ok(addressDto);
+    }
+
+    @GetMapping("/address/get")
+    public ResponseEntity<List<AddressDto>> getCases() {
+        return ResponseEntity.ok(mapper.listAddressToListAddressDto(userService.getCurrentUser().getAddresses()));
     }
 
 }

@@ -1,7 +1,5 @@
 package com.dermanet.backend.config;
 
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
